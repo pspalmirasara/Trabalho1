@@ -6,68 +6,46 @@
 void yyerror(char *);
 
 #include "y.tab.h"
-//  <CIDADE_PRESTACAO>CANAA DO CARAJAS</CIDADE_PRESTACAO>
+// <PRESTADOR_CIDADE>BELEM</PRESTADOR_CIDADE>
+// <TOMADOR_CIDADE>CANAA DOS CARAJAS</TOMADOR_CIDADE>
+// <VALOR_SERVICO>38223,48</VALOR_SERVICO>
+// <VALOR_ISS_RET>0</VALOR_ISS_RET>
 
 %}
 
 PALAVRA [a-zA-Z\ ]+
-
-MUN_PREST_BELEM [<][C][I][D][A][D][E][_][P][R][E][S][T][A][C][A][O][>]{PALAVRA}[<][\/][C][I][D][A][D][E][_][P][R][E][S][T][A][C][A][O][>]
-
-
+NUMERO [0-9]+[,]*[0-9]*
 %%
 
-{MUN_PREST_BELEM} {
+(<PRESTADOR_CIDADE>{PALAVRA}<\/PRESTADOR_CIDADE>) {
 	printf("reconheceu a string: [%s]\n", yytext);
-        yylval = yytext;
-	return CIDADE_PRESTACAO;
-	
-	}
+	return CIDADE_PRESTADOR;
+}
 
-[\ ] {
-	//printf("ESSA BARRA RIDICULA\n");
-	return BARRA;
-	}
+(<TOMADOR_CIDADE>{PALAVRA}<\/TOMADOR_CIDADE>) {
+	printf("reconheceu a string: [%s]\n", yytext);
+	return CIDADE_TOMADOR;
+}
 
-[ " ] {
-	return ASPAS;
-	}
+(<VALOR_SERVICO>{NUMERO}<\/VALOR_SERVICO>) {
+	printf("reconheceu a string: [%s]\n", yytext);
+	return VALOR_SERVICO;
+}
 
-[ \[ ] {
-	//printf("Achou ']'\n");
-	return COLCHETE_E;
-	}
+(<VALOR_ISS_RET>{NUMERO}<\/VALOR_ISS_RET>) {
+	printf("reconheceu a string: [%s]\n", yytext);
+	return VALOR_ISS_RET;
+}
 
-[ \] ] {
-	//printf("Achou '['\n");
-	return COLCHETE_D;
-	}
+\n {
+  return EOL;
+}
 
-[,] {
-	//printf ("Achou ','\n");
-	return VIRGULA;
-	}
+[ \t] ;
 
-
-[A-Z]+ {
-	//printf ("Achou uma palavra\n");
-	return PALAVRA;
-	}
-
-[0-9]+ {
-	//printf ("Achou um numero\n");
-        yylval = atoi(yytext);
-	return NUMERO;
-	}
-
-\n   {
-	//printf ("Achou um EOL\n");
-        return EOL;
-       }
-
-[ \t]+ ;
-
-.     {yyerror("Token nao reconhecido!\n");}
+.	{
+	yyerror("Token nao reconhecido!\n");
+}
 
 %%
 
