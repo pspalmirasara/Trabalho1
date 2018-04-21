@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "ccc_lib.h"
 
 void yyerror(char *c);
 int yylex(void);
@@ -8,8 +9,15 @@ int erro = 1; //variavel para saber se ha erro
 
 %}
 
-%token CIDADE_PRESTADOR CIDADE_TOMADOR VALOR_SERVICO VALOR_ISS_RET EOL
-%left CIDADE_PRESTADOR
+%union 
+{
+        int number;
+        char *string;
+}
+
+%token <string> CIDADE_PRESTADOR CIDADE_TOMADOR VALOR_SERVICO VALOR_ISS_RET
+%token EOL
+%left CIDADE_PRESTADOR CIDADE_TOMADOR VALOR_SERVICO VALOR_ISS_RET
 
 %%
 
@@ -23,8 +31,27 @@ PROGRAMA:
 
 
 EXPRESSAO:
-  |
-  ;
+	CIDADE_PRESTADOR {
+	printf ("Cidade Prestador = [%s]\n", $1);
+
+	}
+	;
+
+	| CIDADE_TOMADOR {printf ("Cidade Tomador = [%s]\n", $1);
+
+	}
+	;
+
+	| VALOR_SERVICO {printf ("Valor Servico = [%s]\n", $1);
+
+	}
+	;
+
+	| VALOR_ISS_RET {printf ("Valor ISS Retido = [%s]\n", $1);
+
+	}
+	;
+
 
 %%
 
