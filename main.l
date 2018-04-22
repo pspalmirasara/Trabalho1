@@ -9,8 +9,6 @@ char nova_str[200];
 
 void yyerror(char *);
 
-
-
 //Funcao para tratar os XML de BELEM
 char entrada[200], saida[200];
 int tam_str;
@@ -43,16 +41,37 @@ void retirar_maiorque_e_menorque(char *entrada, char *saida){
 
 	return;
 }
+
+
+//Funcao para achar o numero do municipio
+
 // <PRESTADOR_CIDADE>BELEM</PRESTADOR_CIDADE>
 // <TOMADOR_CIDADE>CANAA DOS CARAJAS</TOMADOR_CIDADE>
 // <VALOR_SERVICO>38223,48</VALOR_SERVICO>
 // <VALOR_ISS_RET>0</VALOR_ISS_RET>
 
+
+//<CodigoMunicipio>3127701</CodigoMunicipio><Uf>MG</Uf><Cep>35010330</Cep></Endereco><Contato><Telefone>3155032400</Telefone></Contato></Tomador>
+//<CodigoMunicipio>3136207</CodigoMunicipio><Uf>MG</Uf><Cep>35930074</Cep></Endereco><Contato><Telefone>3138521111</Telefone><Email>
+//<ValorServicos>4124.00</ValorServicos>
+//<IssRetido>1</IssRetido>
+
+
+
 %}
 
 PALAVRA [a-zA-Z\ ]+
-NUMERO [0-9]+[,]*[0-9]*
+NUMERO [0-9]+[,]*[.]*[0-9]*
 %%
+
+
+(<TOMADOR_CIDADE>{PALAVRA}<\/TOMADOR_CIDADE>) {
+	//printf("reconheceu a string: [%s]\n", yytext);
+	retirar_maiorque_e_menorque(yytext, nova_str);
+
+	yylval.string=strdup(nova_str);
+	return CIDADE_TOMADOR;
+}
 
 (<PRESTADOR_CIDADE>{PALAVRA}<\/PRESTADOR_CIDADE>) {
 	//printf("reconheceu a string: [%s]\n", yytext);
@@ -61,14 +80,6 @@ NUMERO [0-9]+[,]*[0-9]*
 
 	yylval.string=strdup(nova_str);
 	return CIDADE_PRESTADOR;
-}
-
-(<TOMADOR_CIDADE>{PALAVRA}<\/TOMADOR_CIDADE>) {
-	//printf("reconheceu a string: [%s]\n", yytext);
-	retirar_maiorque_e_menorque(yytext, nova_str);
-
-	yylval.string=strdup(nova_str);
-	return CIDADE_TOMADOR;
 }
 
 (<VALOR_SERVICO>{NUMERO}<\/VALOR_SERVICO>) {
@@ -86,6 +97,30 @@ NUMERO [0-9]+[,]*[0-9]*
 	yylval.string=strdup(nova_str);
 	return VALOR_ISS_RET;
 }
+
+
+
+
+
+
+(<ValorServicos>{NUMERO}<\/ValorServicos>) {
+	//printf("reconheceu a string: [%s]\n", yytext);
+	retirar_maiorque_e_menorque(yytext, nova_str);
+
+	yylval.string=strdup(nova_str);
+	return VALOR_SERVICO;
+}
+
+(<IssRetido>{NUMERO}<\/IssRetido>) {
+	//printf("reconheceu a string: [%s]\n", yytext);
+	retirar_maiorque_e_menorque(yytext, nova_str);
+
+	yylval.string=strdup(nova_str);
+	return VALOR_ISS_RET;
+}
+
+
+
 
 . ;
 
