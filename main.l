@@ -13,7 +13,7 @@ void yyerror(char *);
 char entrada[200], saida[200];
 int tam_str;
 int k; //indice da saida
-void retirar_maiorque_e_menorque(char *entrada, char *saida){
+void retirar_maiorque_e_menorque(char *entrada, char *saida, int numeroDeTags){
 
 	//Limpando a de saida
 	for (int j=0; j<200; j++){
@@ -23,19 +23,23 @@ void retirar_maiorque_e_menorque(char *entrada, char *saida){
 
 	int tam_str;
 	int k; //indice da saida
+	int tagsEncontradas = 0;
 
 	tam_str = strlen(entrada);
 
 	for (int i=0; i<tam_str; i++){
 		if (entrada[i] == '>'){
-			i++;
-			k = 0;
-			while (entrada[i] != '<'){
-				saida[k] = entrada[i];
+			tagsEncontradas++;
+			if(tagsEncontradas == numeroDeTags){
 				i++;
-				k++;
+				k = 0;
+				while (entrada[i] != '<'){
+					saida[k] = entrada[i];
+					i++;
+					k++;
+				}
+				break;
 			}
-			break;
 		}
 	}
 
@@ -76,7 +80,7 @@ NUMERO [0-9]+[,]*[.]*[0-9]*
 (<PRESTADOR_CIDADE>{PALAVRA}<\/PRESTADOR_CIDADE>) {
 	//printf("reconheceu a string: [%s]\n", yytext);
 
-	retirar_maiorque_e_menorque(yytext, nova_str);
+	retirar_maiorque_e_menorque(yytext, nova_str, 1);
 
 	yylval.string=strdup(nova_str);
 	return CIDADE_PRESTADOR;
@@ -84,7 +88,7 @@ NUMERO [0-9]+[,]*[.]*[0-9]*
 
 (<VALOR_SERVICO>{NUMERO}<\/VALOR_SERVICO>) {
 	//printf("reconheceu a string: [%s]\n", yytext);
-	retirar_maiorque_e_menorque(yytext, nova_str);
+	retirar_maiorque_e_menorque(yytext, nova_str, 1);
 
 	yylval.string=strdup(nova_str);
 	return VALOR_SERVICO;
@@ -105,7 +109,7 @@ NUMERO [0-9]+[,]*[.]*[0-9]*
 
 (<ValorServicos>{NUMERO}<\/ValorServicos>) {
 	//printf("reconheceu a string: [%s]\n", yytext);
-	retirar_maiorque_e_menorque(yytext, nova_str);
+	retirar_maiorque_e_menorque(yytext, nova_str, 1);
 
 	yylval.string=strdup(nova_str);
 	return VALOR_SERVICO;
@@ -113,7 +117,7 @@ NUMERO [0-9]+[,]*[.]*[0-9]*
 
 (<IssRetido>{NUMERO}<\/IssRetido>) {
 	//printf("reconheceu a string: [%s]\n", yytext);
-	retirar_maiorque_e_menorque(yytext, nova_str);
+	retirar_maiorque_e_menorque(yytext, nova_str, 1);
 
 	yylval.string=strdup(nova_str);
 	return VALOR_ISS_RET;
