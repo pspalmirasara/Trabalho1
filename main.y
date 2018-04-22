@@ -75,7 +75,7 @@ int main() {
 
 	yyparse();
 
-	printf("%s %s %s %s\n", strings_printar[0], strings_printar[1], strings_printar[2], strings_printar[3]);
+	printf("\"%s\", \"%s\", \"%s\", \"%s\"\n", strings_printar[0], strings_printar[1], strings_printar[2], strings_printar[3]);
 
 	return 0;
 
