@@ -49,19 +49,37 @@ void retirar_maiorque_e_menorque(char *entrada, char *saida, int numeroDeTags){
 }
 
 
-//<CodigoMunicipio>3127701</CodigoMunicipio><Uf>MG</Uf><Cep>35010330</Cep></Endereco><Contato><Telefone>3155032400</Telefone></Contato></Tomador>
-//<CodigoMunicipio>3136207</CodigoMunicipio><Uf>MG</Uf><Cep>35930074</Cep></Endereco><Contato><Telefone>3138521111</Telefone><Email>
-//<ValorServicos>4124.00</ValorServicos>
-//<IssRetido>1</IssRetido>
-
-
-
 %}
 
 PALAVRA [a-zA-Z\ ]+
 NUMERO [0-9]+[,]*[.]*[0-9]*
+EMAIL [a-zA-Z0-9.]*@[a-zA-Z0-9.]*
 
 %%
+
+(<TOMADOR_CIDADE>{PALAVRA}<\/TOMADOR_CIDADE>) { //BELÉM
+	retirar_maiorque_e_menorque(yytext, nova_str, 1);
+	yylval.string=strdup(nova_str);
+	return CIDADE_TOMADOR;
+}
+
+(<ns3:OrgaoGerador>[ \t\r\n]+<ns3:CodigoMunicipio>{NUMERO}<\/ns3:CodigoMunicipio>) { //CORUMBÁ
+	retirar_maiorque_e_menorque(yytext, nova_str, 2);
+	yylval.string=strdup(nova_str);
+	return CIDADE_TOMADOR;
+}
+
+(<CodigoMunicipio>{NUMERO}<\/CodigoMunicipio><Uf>{PALAVRA}<\/Uf><Cep>{NUMERO}<\/Cep><\/Endereco><Contato><Telefone>{NUMERO}<\/Telefone><Email>{EMAIL}<\/Email><\/Contato><\/Tomador>) { //JOAO MOLENVADE_1
+	retirar_maiorque_e_menorque(yytext, nova_str, 1);
+	yylval.string=strdup(nova_str);
+	return CIDADE_TOMADOR;
+}
+
+(<CodigoMunicipio>{NUMERO}<\/CodigoMunicipio><Uf>{PALAVRA}<\/Uf><Cep>{NUMERO}<\/Cep><\/Endereco><Contato><Telefone>{NUMERO}<\/Telefone><\/Contato><\/Tomador>) { //JOAO MOLENVADE_2
+	retirar_maiorque_e_menorque(yytext, nova_str, 1);
+	yylval.string=strdup(nova_str);
+	return CIDADE_TOMADOR;
+}
 
 (<PRESTADOR_CIDADE>{PALAVRA}<\/PRESTADOR_CIDADE>) { //BELÉM
 	retirar_maiorque_e_menorque(yytext, nova_str, 1);
@@ -69,17 +87,12 @@ NUMERO [0-9]+[,]*[.]*[0-9]*
 	return CIDADE_PRESTADOR;
 }
 
-(<TOMADOR_CIDADE>{PALAVRA}<\/TOMADOR_CIDADE>) { //BELÉM
+(<CodigoMunicipio>{NUMERO}<\/CodigoMunicipio><Uf>{PALAVRA}<\/Uf><Cep>{NUMERO}<\/Cep><\/Endereco><Contato><Telefone>{NUMERO}<\/Telefone><Email>{EMAIL}<\/Email><\/Contato><\/PrestadorServico>) { //JOAO MOLENVADE
 	retirar_maiorque_e_menorque(yytext, nova_str, 1);
 	yylval.string=strdup(nova_str);
-	return VALOR_SERVICO;
+	return CIDADE_PRESTADOR;
 }
 
-(<ns3:OrgaoGerador>[ \t\r\n]+<ns3:CodigoMunicipio>{NUMERO}<\/ns3:CodigoMunicipio>) { //CORUMBÁ
-			retirar_maiorque_e_menorque(yytext, nova_str, 2);
-			yylval.string=strdup(nova_str);
-			return CIDADE_TOMADOR;
-}
 
 (<VALOR_SERVICO>{NUMERO}<\/VALOR_SERVICO>) { //BELÉM
 	retirar_maiorque_e_menorque(yytext, nova_str, 1);
@@ -93,6 +106,14 @@ NUMERO [0-9]+[,]*[.]*[0-9]*
 	return VALOR_SERVICO;
 }
 
+
+(<ValorServicos>{NUMERO}<\/ValorServicos>) { //JOAO MONLEVADE
+	retirar_maiorque_e_menorque(yytext, nova_str, 1);
+	yylval.string=strdup(nova_str);
+	return VALOR_SERVICO;
+}
+
+
 (<VALOR_ISS_RET>{NUMERO}<\/VALOR_ISS_RET>) { //BELÉM
 	retirar_maiorque_e_menorque(yytext, nova_str, 1);
 	yylval.string=strdup(nova_str);
@@ -105,8 +126,11 @@ NUMERO [0-9]+[,]*[.]*[0-9]*
 	return VALOR_ISS_RET;
 }
 
-
-
+(<IssRetido>{NUMERO}<\/IssRetido>) { //JOAO MONLEVADE
+	retirar_maiorque_e_menorque(yytext, nova_str, 1);
+	yylval.string=strdup(nova_str);
+	return VALOR_ISS_RET;
+}
 
 . ;
 
