@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-//#include "ccc_lib.h"
 #include "y.tab.h"
 
 char nova_str[200];
@@ -12,10 +11,18 @@ void yyerror(char *);
 
 
 
+//Funcao para tratar os XML de BELEM
 char entrada[200], saida[200];
 int tam_str;
 int k; //indice da saida
 void retirar_maiorque_e_menorque(char *entrada, char *saida){
+
+	//Limpando a de saida
+	for (int j=0; j<200; j++){
+		saida[j] = '\0';
+	}
+	k = 0;
+
 	int tam_str;
 	int k; //indice da saida
 
@@ -36,8 +43,6 @@ void retirar_maiorque_e_menorque(char *entrada, char *saida){
 
 	return;
 }
-
-
 // <PRESTADOR_CIDADE>BELEM</PRESTADOR_CIDADE>
 // <TOMADOR_CIDADE>CANAA DOS CARAJAS</TOMADOR_CIDADE>
 // <VALOR_SERVICO>38223,48</VALOR_SERVICO>
@@ -50,7 +55,7 @@ NUMERO [0-9]+[,]*[0-9]*
 %%
 
 (<PRESTADOR_CIDADE>{PALAVRA}<\/PRESTADOR_CIDADE>) {
-	printf("reconheceu a string: [%s]\n", yytext);
+	//printf("reconheceu a string: [%s]\n", yytext);
 
 	retirar_maiorque_e_menorque(yytext, nova_str);
 
@@ -59,7 +64,7 @@ NUMERO [0-9]+[,]*[0-9]*
 }
 
 (<TOMADOR_CIDADE>{PALAVRA}<\/TOMADOR_CIDADE>) {
-	printf("reconheceu a string: [%s]\n", yytext);
+	//printf("reconheceu a string: [%s]\n", yytext);
 	retirar_maiorque_e_menorque(yytext, nova_str);
 
 	yylval.string=strdup(nova_str);
@@ -67,7 +72,7 @@ NUMERO [0-9]+[,]*[0-9]*
 }
 
 (<VALOR_SERVICO>{NUMERO}<\/VALOR_SERVICO>) {
-	printf("reconheceu a string: [%s]\n", yytext);
+	//printf("reconheceu a string: [%s]\n", yytext);
 	retirar_maiorque_e_menorque(yytext, nova_str);
 
 	yylval.string=strdup(nova_str);
@@ -75,21 +80,21 @@ NUMERO [0-9]+[,]*[0-9]*
 }
 
 (<VALOR_ISS_RET>{NUMERO}<\/VALOR_ISS_RET>) {
-	printf("reconheceu a string: [%s]\n", yytext);
+	//printf("reconheceu a string: [%s]\n", yytext);
 	retirar_maiorque_e_menorque(yytext, nova_str);
 
 	yylval.string=strdup(nova_str);
 	return VALOR_ISS_RET;
 }
 
-\n {
-  return EOL;
-}
+. ;
 
-[ \t] ;
+[ \t\r\n] ;
 
-.	{
-	yyerror("Token nao reconhecido!\n");
+
+<<EOF>> {
+	//printf("Fim de Linha\n");
+	return EOL;
 }
 
 %%

@@ -1,11 +1,12 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "ccc_lib.h"
 
 void yyerror(char *c);
 int yylex(void);
-int erro = 1; //variavel para saber se ha erro
+char strings_printar[4][200]; //Serao usadas para printar na ordem pedida ao final do programa
 
 %}
 
@@ -23,7 +24,6 @@ int erro = 1; //variavel para saber se ha erro
 
 PROGRAMA:
     PROGRAMA EXPRESSAO EOL {
-		erro = 0; //se passou por aqui, eh porque nao ha erro
 		return 0;
 	}
   |
@@ -31,25 +31,39 @@ PROGRAMA:
 
 
 EXPRESSAO:
-	CIDADE_PRESTADOR {
-	printf ("Cidade Prestador = [%s]\n", $1);
+	CIDADE_PRESTADOR { 
+		strcpy (strings_printar[1], $1);
+		}
 
-	}
-	;
+	| CIDADE_TOMADOR { 
+		strcpy (strings_printar[0], $1);
+		}
 
-	| CIDADE_TOMADOR {printf ("Cidade Tomador = [%s]\n", $1);
+	| VALOR_SERVICO { 
+		strcpy (strings_printar[2], $1);
+		}
 
-	}
-	;
+	| VALOR_ISS_RET { 
+		strcpy (strings_printar[3], $1);
+		}
 
-	| VALOR_SERVICO {printf ("Valor Servico = [%s]\n", $1);
 
-	}
-	;
 
-	| VALOR_ISS_RET {printf ("Valor ISS Retido = [%s]\n", $1);
+	| EXPRESSAO CIDADE_PRESTADOR { 
+		strcpy (strings_printar[1], $2);
+		}
 
-	}
+	| EXPRESSAO CIDADE_TOMADOR { 
+		strcpy (strings_printar[0], $2);
+		}
+
+	| EXPRESSAO VALOR_SERVICO { 
+		strcpy (strings_printar[2], $2);
+		}
+
+	| EXPRESSAO VALOR_ISS_RET { 
+		strcpy (strings_printar[3], $2);
+		}
 	;
 
 
@@ -61,12 +75,9 @@ void yyerror(char *s) {
 int main() {
 
 	yyparse();
+	
+	printf("%s %s %s %s\n", strings_printar[0], strings_printar[1], strings_printar[2], strings_printar[3]);	
 
-	if (erro == 1){
-		printf ("ERRO\n");
-	}else{
-		printf ("OK\n");
-	}
 	return 0;
 
 }
