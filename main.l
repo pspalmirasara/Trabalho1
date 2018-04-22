@@ -51,7 +51,7 @@ void retirar_maiorque_e_menorque(char *entrada, char *saida, int numeroDeTags){
 
 %}
 
-PALAVRA [a-zA-Z\ ]+
+PALAVRA [0-9a-zA-ZÇÃ\-\ ]+
 NUMERO [0-9]+[,]*[.]*[0-9]*
 EMAIL [a-zA-Z0-9.]*@[a-zA-Z0-9.]*
 
@@ -70,6 +70,14 @@ EMAIL [a-zA-Z0-9.]*@[a-zA-Z0-9.]*
 }
 
 (<CodigoMunicipio>{NUMERO}<\/CodigoMunicipio><Uf>{PALAVRA}<\/Uf><Cep>{NUMERO}<\/Cep><\/Endereco><Contato><Telefone>{NUMERO}<\/Telefone><Email>{EMAIL}<\/Email><\/Contato><\/Tomador>) { //JOAO MOLENVADE_1
+
+(<ns3:PrestadorServico>[ \t\r\n]*<ns3:IdentificacaoPrestador>[ \t\r\n]*<ns3:CpfCnpj>[ \t\r\n]*(<ns3:Cnpj>{NUMERO}<\/ns3:Cnpj>[ \t\r\n]*)*(<ns3:Cpf>{NUMERO}<\/ns3:Cpf>[ \t\r\n]*)*<\/ns3:CpfCnpj>[ \t\r\n]*<ns3:InscricaoMunicipal>{NUMERO}<\/ns3:InscricaoMunicipal>[ \t\r\n]*<\/ns3:IdentificacaoPrestador>[ \t\r\n]*<ns3:RazaoSocial>{PALAVRA}<\/ns3:RazaoSocial>[ \t\r\n]*<ns3:NomeFantasia>{PALAVRA}<\/ns3:NomeFantasia>[ \t\r\n]*<ns3:Endereco>[ \t\r\n]*<ns3:Endereco>{PALAVRA}<\/ns3:Endereco>[ \t\r\n]*<ns3:Numero>{NUMERO}<\/ns3:Numero>[ \t\r\n]*<ns3:Complemento>{PALAVRA}<\/ns3:Complemento>[ \t\r\n]*<ns3:Bairro>{PALAVRA}<\/ns3:Bairro>[ \t\r\n]*[ \t\r\n]*<ns3:CodigoMunicipio>{NUMERO}<\/ns3:CodigoMunicipio>) { //CORUMBÁ
+	retirar_maiorque_e_menorque(yytext, nova_str, 23);
+	yylval.string=strdup(nova_str);
+	return CIDADE_PRESTADOR;
+}
+
+(<TOMADOR_CIDADE>{PALAVRA}<\/TOMADOR_CIDADE>) { //BELÉM
 	retirar_maiorque_e_menorque(yytext, nova_str, 1);
 	yylval.string=strdup(nova_str);
 	return CIDADE_TOMADOR;
