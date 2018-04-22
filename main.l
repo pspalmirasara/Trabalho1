@@ -5,34 +5,37 @@
 #include <string.h>
 #include "y.tab.h"
 
+//Declaração de variáveis
 char nova_str[200];
-
 void yyerror(char *);
-
-//Funcao para tratar os XML de BELEM
 char entrada[200], saida[200];
 int tam_str;
 int k; //indice da saida
-void retirar_maiorque_e_menorque(char *entrada, char *saida, int numeroDeTags){
 
-	//Limpando a de saida
+//Funções
+void retirar_maiorque_e_menorque(char *entrada, char *saida, int numeroDeTags){
+	//Declaração de variáveis
+	int tam_str, k, tagsEncontradas;
+
+	//Limpando a saida
 	for (int j=0; j<200; j++){
 		saida[j] = '\0';
 	}
-	k = 0;
 
-	int tam_str;
-	int k; //indice da saida
-	int tagsEncontradas = 0;
-
+	//Inicializando as variáveis
+	tagsEncontradas = 0;
 	tam_str = strlen(entrada);
 
+	//Varre a entrada
 	for (int i=0; i<tam_str; i++){
+		//Se encontra o fim de uma tag
 		if (entrada[i] == '>'){
 			tagsEncontradas++;
+			//Se já abriu tags o suficiente pra pegar o conteúdo
 			if(tagsEncontradas == numeroDeTags){
 				i++;
 				k = 0;
+				//Copia o conteúdo até achar a abertura da tag de fechar
 				while (entrada[i] != '<'){
 					saida[k] = entrada[i];
 					i++;
@@ -42,17 +45,8 @@ void retirar_maiorque_e_menorque(char *entrada, char *saida, int numeroDeTags){
 			}
 		}
 	}
-
 	return;
 }
-
-
-//Funcao para achar o numero do municipio
-
-// <PRESTADOR_CIDADE>BELEM</PRESTADOR_CIDADE>
-// <TOMADOR_CIDADE>CANAA DOS CARAJAS</TOMADOR_CIDADE>
-// <VALOR_SERVICO>38223,48</VALOR_SERVICO>
-// <VALOR_ISS_RET>0</VALOR_ISS_RET>
 
 
 //<CodigoMunicipio>3127701</CodigoMunicipio><Uf>MG</Uf><Cep>35010330</Cep></Endereco><Contato><Telefone>3155032400</Telefone></Contato></Tomador>
@@ -66,59 +60,47 @@ void retirar_maiorque_e_menorque(char *entrada, char *saida, int numeroDeTags){
 
 PALAVRA [a-zA-Z\ ]+
 NUMERO [0-9]+[,]*[.]*[0-9]*
+
 %%
 
-
-(<TOMADOR_CIDADE>{PALAVRA}<\/TOMADOR_CIDADE>) {
-	//printf("reconheceu a string: [%s]\n", yytext);
-	retirar_maiorque_e_menorque(yytext, nova_str);
-
-	yylval.string=strdup(nova_str);
-	return CIDADE_TOMADOR;
-}
-
-(<PRESTADOR_CIDADE>{PALAVRA}<\/PRESTADOR_CIDADE>) {
-	//printf("reconheceu a string: [%s]\n", yytext);
-
+(<PRESTADOR_CIDADE>{PALAVRA}<\/PRESTADOR_CIDADE>) { //BELÉM
 	retirar_maiorque_e_menorque(yytext, nova_str, 1);
-
 	yylval.string=strdup(nova_str);
 	return CIDADE_PRESTADOR;
 }
 
-(<VALOR_SERVICO>{NUMERO}<\/VALOR_SERVICO>) {
-	//printf("reconheceu a string: [%s]\n", yytext);
+(<TOMADOR_CIDADE>{PALAVRA}<\/TOMADOR_CIDADE>) { //BELÉM
 	retirar_maiorque_e_menorque(yytext, nova_str, 1);
-
 	yylval.string=strdup(nova_str);
 	return VALOR_SERVICO;
 }
 
-(<VALOR_ISS_RET>{NUMERO}<\/VALOR_ISS_RET>) {
-	//printf("reconheceu a string: [%s]\n", yytext);
-	retirar_maiorque_e_menorque(yytext, nova_str);
+(<ns3:OrgaoGerador>[ \t\r\n]+<ns3:CodigoMunicipio>{NUMERO}<\/ns3:CodigoMunicipio>) { //CORUMBÁ
+			retirar_maiorque_e_menorque(yytext, nova_str, 2);
+			yylval.string=strdup(nova_str);
+			return CIDADE_TOMADOR;
+}
 
+(<VALOR_SERVICO>{NUMERO}<\/VALOR_SERVICO>) { //BELÉM
+	retirar_maiorque_e_menorque(yytext, nova_str, 1);
+	yylval.string=strdup(nova_str);
+	return VALOR_SERVICO;
+}
+
+(<ns3:ValorServicos>{NUMERO}<\/ns3:ValorServicos>) { //CORUMBÁ
+	retirar_maiorque_e_menorque(yytext, nova_str, 1);
+	yylval.string=strdup(nova_str);
+	return VALOR_SERVICO;
+}
+
+(<VALOR_ISS_RET>{NUMERO}<\/VALOR_ISS_RET>) { //BELÉM
+	retirar_maiorque_e_menorque(yytext, nova_str, 1);
 	yylval.string=strdup(nova_str);
 	return VALOR_ISS_RET;
 }
 
-
-
-
-
-
-(<ValorServicos>{NUMERO}<\/ValorServicos>) {
-	//printf("reconheceu a string: [%s]\n", yytext);
+(<ns3:IssRetido>{NUMERO}<\/ns3:IssRetido>) { //CORUMBÁ
 	retirar_maiorque_e_menorque(yytext, nova_str, 1);
-
-	yylval.string=strdup(nova_str);
-	return VALOR_SERVICO;
-}
-
-(<IssRetido>{NUMERO}<\/IssRetido>) {
-	//printf("reconheceu a string: [%s]\n", yytext);
-	retirar_maiorque_e_menorque(yytext, nova_str, 1);
-
 	yylval.string=strdup(nova_str);
 	return VALOR_ISS_RET;
 }
@@ -130,9 +112,7 @@ NUMERO [0-9]+[,]*[.]*[0-9]*
 
 [ \t\r\n] ;
 
-
 <<EOF>> {
-	//printf("Fim de Linha\n");
 	return EOL;
 }
 
