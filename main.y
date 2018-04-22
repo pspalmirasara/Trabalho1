@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ccc_lib.h"
 
 void yyerror(char *c);
 int yylex(void);
@@ -10,7 +9,7 @@ char strings_printar[4][200]; //Serao usadas para printar na ordem pedida ao fin
 
 %}
 
-%union 
+%union
 {
         int number;
         char *string;
@@ -31,37 +30,37 @@ PROGRAMA:
 
 
 EXPRESSAO:
-	CIDADE_PRESTADOR { 
+	CIDADE_PRESTADOR {
 		strcpy (strings_printar[1], $1);
 		}
 
-	| CIDADE_TOMADOR { 
+	| CIDADE_TOMADOR {
 		strcpy (strings_printar[0], $1);
 		}
 
-	| VALOR_SERVICO { 
+	| VALOR_SERVICO {
 		strcpy (strings_printar[2], $1);
 		}
 
-	| VALOR_ISS_RET { 
+	| VALOR_ISS_RET {
 		strcpy (strings_printar[3], $1);
 		}
 
 
 
-	| EXPRESSAO CIDADE_PRESTADOR { 
+	| EXPRESSAO CIDADE_PRESTADOR {
 		strcpy (strings_printar[1], $2);
 		}
 
-	| EXPRESSAO CIDADE_TOMADOR { 
+	| EXPRESSAO CIDADE_TOMADOR {
 		strcpy (strings_printar[0], $2);
 		}
 
-	| EXPRESSAO VALOR_SERVICO { 
+	| EXPRESSAO VALOR_SERVICO {
 		strcpy (strings_printar[2], $2);
 		}
 
-	| EXPRESSAO VALOR_ISS_RET { 
+	| EXPRESSAO VALOR_ISS_RET {
 		strcpy (strings_printar[3], $2);
 		}
 	;
@@ -75,8 +74,8 @@ void yyerror(char *s) {
 int main() {
 
 	yyparse();
-	
-	printf("%s %s %s %s\n", strings_printar[0], strings_printar[1], strings_printar[2], strings_printar[3]);	
+
+	printf("%s %s %s %s\n", strings_printar[0], strings_printar[1], strings_printar[2], strings_printar[3]);
 
 	return 0;
 
